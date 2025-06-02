@@ -1,0 +1,59 @@
+resource "aws_bedrockagent_agent" "reviewer" {
+  agent_name              = "reviewer"
+  agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
+  foundation_model        = data.aws_bedrock_foundation_model.agent.id
+  instruction             = "You are a question answering agent. The user will provide you with a question about contents in knowledge base. Your job is to answer the user's question by referring content in knowledge base."
+}
+
+resource "aws_bedrockagent_agent_knowledge_base_association" "documents" {
+  agent_id             = aws_bedrockagent_agent.reviewer.id
+  knowledge_base_id    = aws_bedrockagent_knowledge_base.documents.id
+  description          = "A knowledge base containing design documents."
+  knowledge_base_state = "ENABLED"
+}
+
+resource "aws_bedrockagent_knowledge_base" "documents" {
+  name     = "documents"
+  role_arn = aws_iam_role.bedrock_knowledge_base.arn
+
+  knowledge_base_configuration {
+    vector_knowledge_base_configuration {
+      embedding_model_arn = data.aws_bedrock_foundation_model.knowledge_base_embedding.model_arn
+    }
+    type = "VECTOR"
+  }
+
+  storage_configuration {
+    type = "OPENSEARCH_SERVERLESS"
+    opensearch_serverless_configuration {
+      collection_arn    = aws_opensearchserverless_collection.bedrock_knowledge_base.arn
+      vector_index_name = opensearch_index.default.name
+      field_mapping {
+        vector_field   = local.aoss_vector_field_name
+        text_field     = local.aoss_text_field_name
+        metadata_field = local.aoss_metadata_field_name
+      }
+    }
+  }
+}
+
+resource "aws_bedrockagent_data_source" "documents" {
+  name                 = aws_s3_bucket.bedrock_data_source.bucket
+  knowledge_base_id    = aws_bedrockagent_knowledge_base.documents.id
+  data_deletion_policy = "RETAIN"
+
+  data_source_configuration {
+    type = "S3"
+    s3_configuration {
+      bucket_arn = aws_s3_bucket.bedrock_data_source.arn
+    }
+  }
+}
+
+data "aws_bedrock_foundation_model" "agent" {
+  model_id = var.bedrock_agent_foundation_model_id
+}
+
+data "aws_bedrock_foundation_model" "knowledge_base_embedding" {
+  model_id = var.bedrock_knowledge_base_embedding_model_id
+}
