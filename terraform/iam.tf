@@ -28,21 +28,6 @@ resource "aws_iam_role_policy_attachment" "bedrock_knowledge_base" {
   policy_arn = aws_iam_policy.bedrock_knowledge_base.arn
 }
 
-resource "aws_iam_role" "bedrock_model_invocation_logging" {
-  name_prefix        = "AmazonBedrockModelInvocationLogging-"
-  assume_role_policy = data.aws_iam_policy_document.bedrock_model_invocation_logging_assume_role_policy.json
-}
-
-resource "aws_iam_policy" "bedrock_model_invocation_logging" {
-  name_prefix = "AmazonBedrockModelInvocationLogging-"
-  policy      = data.aws_iam_policy_document.bedrock_model_invocation_logging_policy.json
-}
-
-resource "aws_iam_role_policy_attachment" "bedrock_model_invocation_logging" {
-  role       = aws_iam_role.bedrock_model_invocation_logging.name
-  policy_arn = aws_iam_policy.bedrock_model_invocation_logging.arn
-}
-
 data "aws_iam_policy_document" "bedrock_agent_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -85,27 +70,6 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
   }
 }
 
-data "aws_iam_policy_document" "bedrock_model_invocation_logging_assume_role_policy" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["bedrock.amazonaws.com"]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-    condition {
-      test     = "ArnLike"
-      variable = "AWS:SourceArn"
-      values   = ["arn:aws:bedrock:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
-    }
-  }
-}
-
 data "aws_iam_policy_document" "bedrock_agent_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"
@@ -117,7 +81,7 @@ data "aws_iam_policy_document" "bedrock_agent_policy" {
     sid       = "BedrockRetrieveStatement"
     effect    = "Allow"
     actions   = ["bedrock:Retrieve"]
-    resources = [aws_bedrockagent_knowledge_base.library.arn]
+    resources = [aws_bedrockagent_knowledge_base.documents.arn]
   }
 }
 
@@ -155,16 +119,5 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_policy" {
       variable = "AWS:PrincipalAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
-  }
-}
-
-data "aws_iam_policy_document" "bedrock_model_invocation_logging_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-    resources = ["${aws_cloudwatch_log_group.bedrock_model_invocation_logging.arn}:log-stream:aws/bedrock/modelinvocations"]
   }
 }

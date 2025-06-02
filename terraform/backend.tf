@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket       = "sbtk-tfstate"
-    key          = "librarian"
+    key          = "heimdall"
     region       = "ap-northeast-1"
     use_lockfile = true
   }

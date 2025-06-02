@@ -1,19 +1,19 @@
-resource "aws_bedrockagent_agent" "librarian" {
-  agent_name              = "librarian"
+resource "aws_bedrockagent_agent" "reviewer" {
+  agent_name              = "reviewer"
   agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
   foundation_model        = data.aws_bedrock_foundation_model.agent.id
-  instruction             = "You are a question answering agent. The user will provide you with a question about contents in e-books in knowledge base. Your job is to answer the user's question by referring content in e-books in knowledge base."
+  instruction             = "You are a question answering agent. The user will provide you with a question about contents in knowledge base. Your job is to answer the user's question by referring content in knowledge base."
 }
 
-resource "aws_bedrockagent_agent_knowledge_base_association" "library" {
-  agent_id             = aws_bedrockagent_agent.librarian.id
-  knowledge_base_id    = aws_bedrockagent_knowledge_base.library.id
-  description          = "This knowledge base contains e-books."
+resource "aws_bedrockagent_agent_knowledge_base_association" "documents" {
+  agent_id             = aws_bedrockagent_agent.reviewer.id
+  knowledge_base_id    = aws_bedrockagent_knowledge_base.documents.id
+  description          = "A knowledge base containing design documents."
   knowledge_base_state = "ENABLED"
 }
 
-resource "aws_bedrockagent_knowledge_base" "library" {
-  name     = "library"
+resource "aws_bedrockagent_knowledge_base" "documents" {
+  name     = "documents"
   role_arn = aws_iam_role.bedrock_knowledge_base.arn
 
   knowledge_base_configuration {
@@ -37,29 +37,15 @@ resource "aws_bedrockagent_knowledge_base" "library" {
   }
 }
 
-resource "aws_bedrockagent_data_source" "books" {
-  name                 = "books"
-  knowledge_base_id    = aws_bedrockagent_knowledge_base.library.id
+resource "aws_bedrockagent_data_source" "documents" {
+  name                 = aws_s3_bucket.bedrock_data_source.bucket
+  knowledge_base_id    = aws_bedrockagent_knowledge_base.documents.id
   data_deletion_policy = "RETAIN"
 
   data_source_configuration {
     type = "S3"
     s3_configuration {
       bucket_arn = aws_s3_bucket.bedrock_data_source.arn
-    }
-  }
-}
-
-resource "aws_bedrock_model_invocation_logging_configuration" "main" {
-  count = var.bedrock_model_invocation_logging_enabled ? 1 : 0
-
-  logging_config {
-    embedding_data_delivery_enabled = true
-    image_data_delivery_enabled     = true
-    text_data_delivery_enabled      = true
-    cloudwatch_config {
-      log_group_name = aws_cloudwatch_log_group.bedrock_model_invocation_logging.name
-      role_arn       = aws_iam_role.bedrock_model_invocation_logging.arn
     }
   }
 }
