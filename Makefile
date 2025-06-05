@@ -20,3 +20,7 @@ ingest:
 .PHONY: review
 review:
 	xargs -- go tool review --agent-id "$(shell terraform -chdir=terraform output -raw bedrock_agent_id)" < internal/checklist/awswellarchitectedframework/urls.txt
+
+.PHONY: generate
+generate:
+	go generate ./...

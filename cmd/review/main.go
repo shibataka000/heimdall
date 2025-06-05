@@ -1,4 +1,4 @@
-// Review the design documents stored in the knowledge base according to the requirements specified in the given URL.
+// Review the design documents stored in the knowledge base according to the requirements in the checklist.
 package main
 
 import (
@@ -18,22 +18,28 @@ func main() {
 
 	command := &cobra.Command{
 		Use:   "review <url>",
-		Short: "Review the design documents stored in the knowledge base according to the requirements specified in the given URL.",
+		Short: "Review the design documents stored in the knowledge base according to the requirements in the checklist.",
 		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			client, err := bedrock.NewClient(cmd.Context())
 			if err != nil {
 				return err
 			}
-			prompt, err := wa.GeneratePrompt(args[0])
+			requirements, err := wa.Requirements()
 			if err != nil {
 				return err
 			}
-			response, err := client.InvokeAgent(cmd.Context(), agentID, prompt)
-			if err != nil {
-				return err
+			for _, requirement := range requirements {
+				prompt, err := wa.Prompt(requirement)
+				if err != nil {
+					return err
+				}
+				response, err := client.InvokeAgent(cmd.Context(), agentID, prompt)
+				if err != nil {
+					return err
+				}
+				fmt.Println(string(response))
 			}
-			fmt.Println(string(response))
 			return nil
 		},
 		SilenceUsage: true,
