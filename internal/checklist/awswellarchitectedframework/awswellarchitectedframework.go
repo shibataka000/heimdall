@@ -3,51 +3,47 @@ package awswellarchitectedframework
 
 import (
 	"bytes"
-	"fmt"
-	"net/http"
+	"encoding/json"
 	"text/template"
 
 	_ "embed"
 
-	"github.com/PuerkitoBio/goquery"
+	_ "github.com/PuerkitoBio/goquery" // For generator.go.
 )
 
 //go:embed prompt.md
 var promptTemplateBytes []byte
 
-// GeneratePrompt creates a prompt for reviews based on AWS Well-Architected Framework requirements retrieved from the specified URL.
-func GeneratePrompt(url string) (string, error) {
-	promptTemplate, err := template.New("prompt").Parse(string(promptTemplateBytes))
-	if err != nil {
-		return "", err
+//go:generate go run generator.go
+//go:embed requirements.json
+var requirementsBytes []byte
+
+// Requirement that design documents should satisfy.
+// This is equivalent to the best practice in the AWS Well-Architected Framework.
+type Requirement string
+
+// Requirements returns requirements that design documents should satisfy.
+// These are equivalent to the best practices in the AWS Well-Architected Framework.
+func Requirements() ([]Requirement, error) {
+	requirements := []Requirement{}
+	if err := json.Unmarshal(requirementsBytes, &requirements); err != nil {
+		return nil, err
 	}
-	requirement, err := fetchMainContent(url)
+	return requirements, nil
+}
+
+// Prompt returns a prompt for reviews based on the given requirement in the AWS Well-Architected Framework.
+func Prompt(requirement Requirement) (string, error) {
+	promptTemplate, err := template.New("prompt").Parse(string(promptTemplateBytes))
 	if err != nil {
 		return "", err
 	}
 	var buf bytes.Buffer
 	data := map[string]string{
-		"Requirement": requirement,
+		"Requirement": string(requirement),
 	}
 	if err := promptTemplate.Execute(&buf, data); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
-}
-
-func fetchMainContent(url string) (string, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close() // nolint:errcheck
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to fetch content from %s: %s", url, resp.Status)
-	}
-
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	return doc.Find("#main-content").Text(), nil
 }
