@@ -28,6 +28,7 @@ resource "aws_iam_role_policy_attachment" "bedrock_knowledge_base" {
   policy_arn = aws_iam_policy.bedrock_knowledge_base.arn
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
 data "aws_iam_policy_document" "bedrock_agent_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -49,6 +50,7 @@ data "aws_iam_policy_document" "bedrock_agent_assume_role_policy" {
   }
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html
 data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -70,6 +72,7 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
   }
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
 data "aws_iam_policy_document" "bedrock_agent_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"
@@ -85,6 +88,7 @@ data "aws_iam_policy_document" "bedrock_agent_policy" {
   }
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html
 data "aws_iam_policy_document" "bedrock_knowledge_base_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"
