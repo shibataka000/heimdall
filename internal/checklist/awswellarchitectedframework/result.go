@@ -2,10 +2,17 @@ package awswellarchitectedframework
 
 import "encoding/json"
 
+type reviewResult struct {
+	Title     string `json:"title"`
+	Result    string `json:"result"`
+	Reason    string `json:"reason"`
+	Locations string `json:"locations"`
+}
+
 func ReviewResult(resp []byte) (string, error) {
-	var result ReviewResultX
+	var result reviewResult
 	if json.Unmarshal(resp, &result) != nil {
-		result = ReviewResultX{
+		result = reviewResult{
 			Title:     "Review Result",
 			Result:    "Unknown",
 			Reason:    "The response is not in the expected format.",

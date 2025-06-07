@@ -1,4 +1,3 @@
-// Package awswellarchitectedframework provides functionality related to the AWS Well-Architected Framework requirements.
 package awswellarchitectedframework
 
 import (
@@ -6,8 +5,6 @@ import (
 	"text/template"
 
 	_ "embed"
-
-	_ "github.com/PuerkitoBio/goquery" // For generator.go.
 )
 
 //go:embed prompt.md
