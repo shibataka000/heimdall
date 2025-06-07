@@ -1,7 +1,7 @@
 resource "aws_bedrockagent_agent" "reviewer" {
   agent_name              = "reviewer"
   agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
-  foundation_model        = data.aws_bedrock_foundation_model.agent.id
+  foundation_model        = data.aws_bedrock_inference_profile.agent.inference_profile_arn
   instruction             = "You are a question answering agent. The user will provide you with a question about contents in knowledge base. Your job is to answer the user's question by referring content in knowledge base."
 }
 
@@ -50,8 +50,8 @@ resource "aws_bedrockagent_data_source" "documents" {
   }
 }
 
-data "aws_bedrock_foundation_model" "agent" {
-  model_id = var.bedrock_agent_foundation_model_id
+data "aws_bedrock_inference_profile" "agent" {
+  inference_profile_id = var.bedrock_agent_inference_profile_id
 }
 
 data "aws_bedrock_foundation_model" "knowledge_base_embedding" {

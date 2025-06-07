@@ -73,12 +73,19 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
 }
 
 // https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
+// https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-prereq.html
 data "aws_iam_policy_document" "bedrock_agent_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"
     effect    = "Allow"
     actions   = ["bedrock:InvokeModel"]
-    resources = [data.aws_bedrock_foundation_model.agent.model_arn]
+    resources = data.aws_bedrock_inference_profile.agent.models[*].model_arn
+  }
+  statement {
+    sid       = "BedrockGetInferenceProfileStatement"
+    effect    = "Allow"
+    actions   = ["bedrock:GetInferenceProfile"]
+    resources = [data.aws_bedrock_inference_profile.agent.inference_profile_arn]
   }
   statement {
     sid       = "BedrockRetrieveStatement"
