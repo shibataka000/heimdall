@@ -40,7 +40,11 @@ func main() {
 				if err != nil {
 					return err
 				}
-				fmt.Println(string(response))
+				result, err := wa.ReviewResult(response)
+				if err != nil {
+					return err
+				}
+				fmt.Println(result)
 				time.Sleep(30 * time.Second)
 			}
 			return nil
