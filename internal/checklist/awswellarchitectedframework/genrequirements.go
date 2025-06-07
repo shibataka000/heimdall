@@ -54,9 +54,8 @@ func getBestPracticeContent(resp []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	content := doc.Find("#resources").PrevAll().Text()
+	content := doc.Find("#main-content").Text()
 	content = regexp.MustCompile("\\s+").ReplaceAllString(content, " ")
-	log.Println(content)
 	return content, nil
 }
 
