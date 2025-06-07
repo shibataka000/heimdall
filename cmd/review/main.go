@@ -4,7 +4,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	"github.com/shibataka000/heimdall/internal/aws/bedrock"
 	wa "github.com/shibataka000/heimdall/internal/checklist/awswellarchitectedframework"
@@ -33,11 +35,13 @@ func main() {
 				if err != nil {
 					return err
 				}
+				log.Println(prompt)
 				response, err := client.InvokeAgent(cmd.Context(), agentID, prompt)
 				if err != nil {
 					return err
 				}
 				fmt.Println(string(response))
+				time.Sleep(30 * time.Second)
 			}
 			return nil
 		},

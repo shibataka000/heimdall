@@ -14,6 +14,7 @@ import (
 	"net/http"
 	urllib "net/url"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 
@@ -27,13 +28,13 @@ func walk(url string, depth int) ([]string, error) {
 	}
 	contents := []string{}
 	if depth == 0 {
-		content, err := getMainContent(resp)
+		content, err := getBestPracticeContent(resp)
 		if err != nil {
 			return nil, err
 		}
 		contents = append(contents, content)
 	} else {
-		links, err := getLinks(resp)
+		links, err := listLinks(resp)
 		if err != nil {
 			return nil, err
 		}
@@ -48,15 +49,18 @@ func walk(url string, depth int) ([]string, error) {
 	return contents, nil
 }
 
-func getMainContent(resp []byte) (string, error) {
+func getBestPracticeContent(resp []byte) (string, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(resp))
 	if err != nil {
 		return "", err
 	}
-	return doc.Find("#main-content").Text(), nil
+	content := doc.Find("#resources").PrevAll().Text()
+	content = regexp.MustCompile("\\s+").ReplaceAllString(content, " ")
+	log.Println(content)
+	return content, nil
 }
 
-func getLinks(resp []byte) ([]string, error) {
+func listLinks(resp []byte) ([]string, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(resp))
 	if err != nil {
 		return nil, err
@@ -102,7 +106,7 @@ func fetch(url string) ([]byte, error) {
 
 func main() {
 	// Appendix -> Pillars -> Best practice areas -> Questions -> Best practices.
-	bestpractices, err := walk("https://docs.aws.amazon.com/wellarchitected/latest/framework/appendix.html", 4)
+	bestpractices, err := walk("https://docs.aws.amazon.com/wellarchitected/latest/framework/a-identity-and-access-management.html", 2)
 	if err != nil {
 		panic(err)
 	}

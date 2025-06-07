@@ -78,8 +78,8 @@ data "aws_iam_policy_document" "bedrock_agent_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"
     effect    = "Allow"
-    actions   = ["bedrock:InvokeModel"]
-    resources = data.aws_bedrock_inference_profile.agent.models[*].model_arn
+    actions   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
+    resources = concat(data.aws_bedrock_inference_profile.agent.models[*].model_arn, [data.aws_bedrock_inference_profile.agent.inference_profile_arn])
   }
   statement {
     sid       = "BedrockGetInferenceProfileStatement"
@@ -90,7 +90,7 @@ data "aws_iam_policy_document" "bedrock_agent_policy" {
   statement {
     sid       = "BedrockRetrieveStatement"
     effect    = "Allow"
-    actions   = ["bedrock:Retrieve"]
+    actions   = ["bedrock:Retrieve", "bedrock:RetrieveAndGenerate"]
     resources = [aws_bedrockagent_knowledge_base.documents.arn]
   }
 }
