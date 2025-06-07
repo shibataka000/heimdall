@@ -2,6 +2,7 @@ package awswellarchitectedframework
 
 import (
 	"encoding/json"
+	"strings"
 
 	_ "embed"
 
@@ -24,4 +25,9 @@ func Requirements() ([]Requirement, error) {
 		return nil, err
 	}
 	return requirements, nil
+}
+
+// title returns the title of the [Requirement].
+func (r Requirement) title() string {
+	return strings.Split(string(r), " ")[0]
 }

@@ -3,7 +3,6 @@ package awswellarchitectedframework
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 // ReviewResult represents the result of a review against a requirement.
@@ -21,6 +20,7 @@ func NewReviewResult(requirement Requirement, response []byte) ReviewResult {
 	if json.Unmarshal(response, &result) != nil {
 		result = newReviewResultForInvalidResponse(requirement, response)
 	}
+	result.Title = requirement.title()
 	return result
 }
 
@@ -36,7 +36,7 @@ func (r ReviewResult) String() string {
 // newReviewResultForInvalidResponse creates a new [ReviewResult] for an invalid response from Amazon Bedrock.
 func newReviewResultForInvalidResponse(requirement Requirement, response []byte) ReviewResult {
 	return ReviewResult{
-		Title:     strings.Split(string(requirement), " ")[0],
+		Title:     requirement.title(),
 		Result:    "不明",
 		Reason:    fmt.Sprintf("Amazon Bedrock の応答が不正です：%s", string(response)),
 		Locations: "",
