@@ -16,7 +16,7 @@ var requirementsBytes []byte
 // This is equivalent to the best practice in the AWS Well-Architected Framework.
 type Requirement string
 
-// Requirements returns requirements that design documents should satisfy.
+// Requirements returns the list of [Requirement] that design documents should satisfy.
 // These are equivalent to the best practices in the AWS Well-Architected Framework.
 func Requirements() ([]Requirement, error) {
 	requirements := []Requirement{}

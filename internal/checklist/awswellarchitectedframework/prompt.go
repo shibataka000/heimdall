@@ -10,8 +10,11 @@ import (
 //go:embed prompt.md
 var promptTemplateBytes []byte
 
-// Prompt returns a prompt for reviews based on the given requirement in the AWS Well-Architected Framework.
-func Prompt(requirement Requirement) (string, error) {
+// Prompt for reviews based on the AWS Well-Architected Framework requirements.
+type Prompt string
+
+// NewPrompt creates a new [Prompt] for reviews based on the given AWS Well-Architected Framework requirements.
+func NewPrompt(requirement Requirement) (Prompt, error) {
 	promptTemplate, err := template.New("prompt").Parse(string(promptTemplateBytes))
 	if err != nil {
 		return "", err
@@ -23,5 +26,10 @@ func Prompt(requirement Requirement) (string, error) {
 	if err := promptTemplate.Execute(&b, data); err != nil {
 		return "", err
 	}
-	return b.String(), nil
+	return Prompt(b.String()), nil
+}
+
+// String returns the string representation of the [Prompt].
+func (p Prompt) String() string {
+	return string(p)
 }

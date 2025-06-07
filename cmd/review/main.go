@@ -31,20 +31,17 @@ func main() {
 				return err
 			}
 			for _, requirement := range requirements {
-				prompt, err := wa.Prompt(requirement)
+				prompt, err := wa.NewPrompt(requirement)
 				if err != nil {
 					return err
 				}
 				log.Println(prompt)
-				response, err := client.InvokeAgent(cmd.Context(), agentID, prompt)
+				response, err := client.InvokeAgent(cmd.Context(), agentID, prompt.String())
 				if err != nil {
 					return err
 				}
-				result, err := wa.ReviewResult(requirement, response)
-				if err != nil {
-					return err
-				}
-				fmt.Println(result)
+				result := wa.NewReviewResult(requirement, response)
+				fmt.Println(result.String())
 				time.Sleep(30 * time.Second)
 			}
 			return nil
