@@ -1,6 +1,9 @@
 package awswellarchitectedframework
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type reviewResult struct {
 	Title     string `json:"title"`
@@ -15,7 +18,7 @@ func ReviewResult(requirement Requirement, resp []byte) (string, error) {
 		result = reviewResult{
 			Title:     string(requirement),
 			Result:    "不明",
-			Reason:    string(resp),
+			Reason:    fmt.Sprintf("Amazon Bedrock の応答が不正です：%s", string(resp)),
 			Locations: "",
 		}
 	}

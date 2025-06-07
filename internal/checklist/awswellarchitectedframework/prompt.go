@@ -16,12 +16,12 @@ func Prompt(requirement Requirement) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var buf bytes.Buffer
+	var b bytes.Buffer
 	data := map[string]string{
 		"Requirement": string(requirement),
 	}
-	if err := promptTemplate.Execute(&buf, data); err != nil {
+	if err := promptTemplate.Execute(&b, data); err != nil {
 		return "", err
 	}
-	return buf.String(), nil
+	return b.String(), nil
 }
