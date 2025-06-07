@@ -5,10 +5,10 @@ import (
 
 	_ "embed"
 
-	_ "github.com/PuerkitoBio/goquery" // For generator.go.
+	_ "github.com/PuerkitoBio/goquery" // For genrequirements.go
 )
 
-//go:generate go run generator.go
+//go:generate go run genrequirements.go
 //go:embed requirements.json
 var requirementsBytes []byte
 

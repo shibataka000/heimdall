@@ -40,7 +40,7 @@ func main() {
 				if err != nil {
 					return err
 				}
-				result, err := wa.ReviewResult(response)
+				result, err := wa.ReviewResult(requirement, response)
 				if err != nil {
 					return err
 				}

@@ -9,14 +9,14 @@ type reviewResult struct {
 	Locations string `json:"locations"`
 }
 
-func ReviewResult(resp []byte) (string, error) {
+func ReviewResult(requirement Requirement, resp []byte) (string, error) {
 	var result reviewResult
 	if json.Unmarshal(resp, &result) != nil {
 		result = reviewResult{
-			Title:     "Review Result",
-			Result:    "Unknown",
-			Reason:    "The response is not in the expected format.",
-			Locations: "N/A",
+			Title:     string(requirement),
+			Result:    "不明",
+			Reason:    string(resp),
+			Locations: "",
 		}
 	}
 	b, err := json.MarshalIndent(result, "", "  ")
