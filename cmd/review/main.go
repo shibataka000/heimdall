@@ -19,7 +19,6 @@ func main() {
 	command := &cobra.Command{
 		Use:   "review <url>",
 		Short: "Review the design documents stored in the knowledge base according to the requirements in the checklist.",
-		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			client, err := bedrock.NewClient(cmd.Context())
 			if err != nil {
