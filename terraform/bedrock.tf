@@ -2,7 +2,7 @@ resource "aws_bedrockagent_agent" "reviewer" {
   agent_name              = "reviewer"
   agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
   foundation_model        = data.aws_bedrock_inference_profile.agent.inference_profile_arn
-  instruction             = "You are a question answering agent. The user will provide you with a question about contents in knowledge base. Your job is to answer the user's question by referring content in knowledge base."
+  instruction             = file("${path.module}/prompts/instruction.md")
 
   depends_on = [aws_iam_role_policy_attachment.bedrock_agent]
 }
