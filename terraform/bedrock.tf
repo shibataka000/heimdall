@@ -3,6 +3,7 @@ resource "aws_bedrockagent_agent" "reviewer" {
   agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
   foundation_model        = data.aws_bedrock_inference_profile.agent.inference_profile_arn
   instruction             = file("${path.module}/prompts/instruction.md")
+  description             = "The agent reviewing the design documents stored in the knowledge base according to the requirements in the checklist."
 
   depends_on = [aws_iam_role_policy_attachment.bedrock_agent]
 }
@@ -15,8 +16,9 @@ resource "aws_bedrockagent_agent_knowledge_base_association" "documents" {
 }
 
 resource "aws_bedrockagent_knowledge_base" "documents" {
-  name     = "documents"
-  role_arn = aws_iam_role.bedrock_knowledge_base.arn
+  name        = "documents"
+  role_arn    = aws_iam_role.bedrock_knowledge_base.arn
+  description = "The knowledge base containing design documents for the reviewer agent."
 
   knowledge_base_configuration {
     vector_knowledge_base_configuration {
