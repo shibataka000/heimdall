@@ -3,7 +3,9 @@ package bedrock
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -90,8 +92,15 @@ func (c *Client) InvokeAgent(ctx context.Context, agentID string, inputText stri
 	response := []byte{}
 	stream := output.GetStream()
 	for event := range stream.Events() {
-		if chunk, ok := event.(*agentruntimetypes.ResponseStreamMemberChunk); ok {
-			response = append(response, chunk.Value.Bytes...)
+		switch resp := event.(type) {
+		case *agentruntimetypes.ResponseStreamMemberChunk:
+			response = append(response, resp.Value.Bytes...)
+		case *agentruntimetypes.ResponseStreamMemberTrace:
+			b, err := json.Marshal(resp)
+			if err != nil {
+				return nil, err
+			}
+			log.Println(string(b))
 		}
 	}
 	return response, stream.Close()
