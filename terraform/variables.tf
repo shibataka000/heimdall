@@ -1,5 +1,5 @@
 variable "bedrock_agent_inference_profile_id" {
-  default     = "apac.anthropic.claude-3-5-sonnet-20241022-v2:0"
+  default     = "apac.amazon.nova-pro-v1:0"
   description = "The inference profile ID for the agent."
   type        = string
 }
