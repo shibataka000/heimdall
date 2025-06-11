@@ -32,6 +32,6 @@ require (
 )
 
 tool (
-	github.com/shibataka000/heimdall/cmd/ingest
-	github.com/shibataka000/heimdall/cmd/review
+	github.com/shibataka000/heimdall/cmd/tool/ingest
+	github.com/shibataka000/heimdall/cmd/tool/review
 )
