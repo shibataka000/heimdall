@@ -28,6 +28,7 @@ resource "aws_iam_role_policy_attachment" "bedrock_knowledge_base" {
   policy_arn = aws_iam_policy.bedrock_knowledge_base.arn
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
 data "aws_iam_policy_document" "bedrock_agent_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -49,6 +50,7 @@ data "aws_iam_policy_document" "bedrock_agent_assume_role_policy" {
   }
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html
 data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
   statement {
     effect  = "Allow"
@@ -70,21 +72,30 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
   }
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
+// https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-prereq.html
 data "aws_iam_policy_document" "bedrock_agent_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"
     effect    = "Allow"
-    actions   = ["bedrock:InvokeModel"]
-    resources = [data.aws_bedrock_foundation_model.agent.model_arn]
+    actions   = ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"]
+    resources = concat(data.aws_bedrock_inference_profile.agent.models[*].model_arn, [data.aws_bedrock_inference_profile.agent.inference_profile_arn])
+  }
+  statement {
+    sid       = "BedrockGetInferenceProfileStatement"
+    effect    = "Allow"
+    actions   = ["bedrock:GetInferenceProfile"]
+    resources = [data.aws_bedrock_inference_profile.agent.inference_profile_arn]
   }
   statement {
     sid       = "BedrockRetrieveStatement"
     effect    = "Allow"
-    actions   = ["bedrock:Retrieve"]
+    actions   = ["bedrock:Retrieve", "bedrock:RetrieveAndGenerate"]
     resources = [aws_bedrockagent_knowledge_base.documents.arn]
   }
 }
 
+// https://docs.aws.amazon.com/bedrock/latest/userguide/kb-permissions.html
 data "aws_iam_policy_document" "bedrock_knowledge_base_policy" {
   statement {
     sid       = "BedrockInvokeModelStatement"

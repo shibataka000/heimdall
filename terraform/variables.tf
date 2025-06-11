@@ -1,6 +1,6 @@
-variable "bedrock_agent_foundation_model_id" {
-  default     = "anthropic.claude-3-5-sonnet-20241022-v2:0"
-  description = "The foundation model ID for the agent."
+variable "bedrock_agent_inference_profile_id" {
+  default     = "apac.anthropic.claude-3-5-sonnet-20241022-v2:0"
+  description = "The inference profile ID for the agent."
   type        = string
 }
 
