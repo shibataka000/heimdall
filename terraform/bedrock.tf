@@ -5,6 +5,36 @@ resource "aws_bedrockagent_agent" "reviewer" {
   instruction             = file("${path.module}/prompts/instruction.md")
   description             = "The agent reviewing the design documents stored in the knowledge base according to the requirements in the checklist."
 
+  prompt_override_configuration {
+    prompt_configurations {
+      base_prompt_template = jsonencode({
+        "system" : file("${path.module}/prompts/post_processing.md"),
+        "messages" : [
+          {
+            "role" : "user",
+            "content" : [
+              {
+                "text" : "Please output your transformed response within <final_response></final_response> XML tags."
+              }
+            ]
+          }
+        ]
+      })
+      parser_mode          = "DEFAULT"
+      prompt_creation_mode = "OVERRIDDEN"
+      prompt_state         = "ENABLED"
+      prompt_type          = "POST_PROCESSING"
+
+      inference_configuration {
+        max_length     = 2048
+        stop_sequences = []
+        temperature    = 0.0
+        top_p          = 0.1
+        top_k          = 100
+      }
+    }
+  }
+
   depends_on = [aws_iam_role_policy_attachment.bedrock_agent]
 }
 
