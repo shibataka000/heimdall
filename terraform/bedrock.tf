@@ -35,7 +35,7 @@ resource "aws_bedrockagent_agent" "reviewer" {
     }
   }
 
-  depends_on = [aws_iam_role_policy_attachment.bedrock_agent]
+  depends_on = [time_sleep.wait_agent_resource_role_creation]
 }
 
 resource "aws_bedrockagent_agent_knowledge_base_association" "documents" {
