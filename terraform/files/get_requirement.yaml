@@ -1,0 +1,33 @@
+openapi: 3.0.0
+info:
+  title: Get a requirement in the checklist.
+  version: 1.0.0
+  description: Get a requirement in the checklist.
+paths:
+  /checklist/{checklistId}/requirement/{requirementId}:
+    get:
+      summary: Get a requirement in the checklist.
+      description: Get a requirement in the checklist.
+      operationId: get-requirement
+      parameters:
+        - name: checklistId
+          in: path
+          description: The ID of the checklist.
+          required: true
+          schema:
+            type: string
+            enum:
+              - aws-well-architected-framework
+        - name: requirementId
+          in: path
+          description: The ID of the requirement.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The requirement in the checklist.
+          content:
+            application/json:
+              schema:
+                type: string

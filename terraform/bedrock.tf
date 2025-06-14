@@ -5,36 +5,6 @@ resource "aws_bedrockagent_agent" "reviewer" {
   instruction             = file("${path.module}/files/instruction.md")
   description             = "The agent reviewing the design documents stored in the knowledge base according to the requirements in the checklist."
 
-  prompt_override_configuration {
-    prompt_configurations {
-      base_prompt_template = jsonencode({
-        "system" : file("${path.module}/files/post_processing.md"),
-        "messages" : [
-          {
-            "role" : "user",
-            "content" : [
-              {
-                "text" : "Please output your transformed response within <final_response></final_response> XML tags."
-              }
-            ]
-          }
-        ]
-      })
-      parser_mode          = "DEFAULT"
-      prompt_creation_mode = "OVERRIDDEN"
-      prompt_state         = "ENABLED"
-      prompt_type          = "POST_PROCESSING"
-
-      inference_configuration {
-        max_length     = 2048
-        stop_sequences = []
-        temperature    = 0.0
-        top_p          = 0.1
-        top_k          = 100
-      }
-    }
-  }
-
   depends_on = [time_sleep.wait_agent_resource_role_creation]
 }
 
@@ -81,6 +51,18 @@ resource "aws_bedrockagent_data_source" "documents" {
     s3_configuration {
       bucket_arn = aws_s3_bucket.bedrock_data_source.arn
     }
+  }
+}
+
+resource "aws_bedrockagent_agent_action_group" "get_requirement" {
+  action_group_name = aws_lambda_function.get_requirement.function_name
+  agent_id          = aws_bedrockagent_agent.reviewer.agent_id
+  agent_version     = "DRAFT"
+  action_group_executor {
+    lambda = aws_lambda_function.get_requirement.arn
+  }
+  api_schema {
+    payload = file("${path.module}/files/get_requirement.yaml")
   }
 }
 
