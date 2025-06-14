@@ -2,13 +2,13 @@ resource "aws_bedrockagent_agent" "reviewer" {
   agent_name              = "reviewer"
   agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
   foundation_model        = data.aws_bedrock_inference_profile.agent.inference_profile_arn
-  instruction             = file("${path.module}/prompts/instruction.md")
+  instruction             = file("${path.module}/files/instruction.md")
   description             = "The agent reviewing the design documents stored in the knowledge base according to the requirements in the checklist."
 
   prompt_override_configuration {
     prompt_configurations {
       base_prompt_template = jsonencode({
-        "system" : file("${path.module}/prompts/post_processing.md"),
+        "system" : file("${path.module}/files/post_processing.md"),
         "messages" : [
           {
             "role" : "user",
