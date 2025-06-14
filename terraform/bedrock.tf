@@ -55,9 +55,11 @@ resource "aws_bedrockagent_data_source" "documents" {
 }
 
 resource "aws_bedrockagent_agent_action_group" "get_requirement" {
-  action_group_name = aws_lambda_function.get_requirement.function_name
-  agent_id          = aws_bedrockagent_agent.reviewer.agent_id
-  agent_version     = "DRAFT"
+  action_group_name          = aws_lambda_function.get_requirement.function_name
+  agent_id                   = aws_bedrockagent_agent.reviewer.agent_id
+  agent_version              = "DRAFT"
+  skip_resource_in_use_check = true
+
   action_group_executor {
     lambda = aws_lambda_function.get_requirement.arn
   }
