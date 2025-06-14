@@ -12,8 +12,16 @@ lint:
 test:
 	go test ./...
 
+.PHONY: build
+build: dist/getrequirement dist/savereviewresult
+
+.PHONY: generate
+generate:
+	go generate ./...
+
 .PHONY: clean
 clean:
+	$(RM) dist/*
 	go clean -testcache
 
 .PHONY: ingest
@@ -25,9 +33,7 @@ ingest:
 review:
 	go tool review --agent-id "$(shell terraform -chdir=terraform output -raw bedrock_agent_id)" --filter ".*"
 
-.PHONY: generate
-generate:
-	go generate ./...
+dist/%: cmd/lambda/%/main.go FORCE
+	GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o $@ -tags lambda.norpc $<
 
-dist/getrequirement/bootstrap:
-	GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o bootstrap -tags lambda.norpc main.go
+FORCE:
