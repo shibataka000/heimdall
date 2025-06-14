@@ -28,6 +28,16 @@ resource "aws_iam_role_policy_attachment" "bedrock_knowledge_base" {
   policy_arn = aws_iam_policy.bedrock_knowledge_base.arn
 }
 
+resource "aws_iam_role" "lambda_execution_role" {
+  name_prefix        = "AWSLambdaExecutionRole-"
+  assume_role_policy = data.aws_iam_policy_document.lambda_execution_role_assume_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = data.aws_iam_policy.lambda_basic_execution_role.arn
+}
+
 // https://docs.aws.amazon.com/bedrock/latest/userguide/agents-permissions.html
 data "aws_iam_policy_document" "bedrock_agent_assume_role_policy" {
   statement {
@@ -68,6 +78,17 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_assume_role_policy" {
       test     = "ArnLike"
       variable = "AWS:SourceArn"
       values   = ["arn:aws:bedrock:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:knowledge-base/*"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "lambda_execution_role_assume_role_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
     }
   }
 }
@@ -131,4 +152,8 @@ data "aws_iam_policy_document" "bedrock_knowledge_base_policy" {
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
+}
+
+data "aws_iam_policy" "lambda_basic_execution_role" {
+  name = "AWSLambdaBasicExecutionRole"
 }
