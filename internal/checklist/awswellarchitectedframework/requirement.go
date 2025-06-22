@@ -2,29 +2,32 @@ package awswellarchitectedframework
 
 import (
 	"encoding/json"
+	"fmt"
 
 	_ "embed"
 
-	_ "github.com/PuerkitoBio/goquery" // For genrequirements.go
+	_ "github.com/PuerkitoBio/goquery" // for genrequirements.go
 )
 
-// Requirement that design documents should satisfy.
-// This is equivalent to the best practice in the AWS Well-Architected Framework.
 type Requirement struct {
+	ID    string `json:"id"`
 	Title string `json:"title"`
 	Body  string `json:"body"`
 }
-
-// Requirements that design documents should satisfy.
-// These are equivalent to the best practices in the AWS Well-Architected Framework.
-var Requirements []Requirement
 
 //go:generate go run genrequirements.go
 //go:embed requirements.json
 var requirementsBytes []byte
 
-func init() {
-	if err := json.Unmarshal(requirementsBytes, &Requirements); err != nil {
-		panic(err)
+func GetRequirement(id string) (Requirement, error) {
+	requirements := []Requirement{}
+	if err := json.Unmarshal(requirementsBytes, &requirements); err != nil {
+		return Requirement{}, nil
 	}
+	for _, r := range requirements {
+		if r.ID == id {
+			return r, nil
+		}
+	}
+	return Requirement{}, fmt.Errorf("requirement '%s' was not found", id)
 }

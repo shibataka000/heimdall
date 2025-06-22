@@ -10,9 +10,10 @@ Heimdall reviews design documents and ensures that they satisfy the requirements
 
 ## Requirements
 
-- AWS CLI
-- Go
-- Terraform
+- [AWS CLI](https://aws.amazon.com/cli/)
+- [Go](https://go.dev/)
+- [Terraform](https://developer.hashicorp.com/terraform)
+- [jq](https://jqlang.org/)
 - [Access to Amazon Bedrock foundation models](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access-modify.html)
 
 ## Setup
@@ -20,8 +21,7 @@ Heimdall reviews design documents and ensures that they satisfy the requirements
 1. Construct the knowledge base and the agent.
 
 ```bash
-terraform -chdir=terraform init
-terraform -chdir=terraform apply
+make terraform-apply
 ```
 
 ## Usage
@@ -39,8 +39,20 @@ make ingest
 make review
 ```
 
+> [!NOTE]
+>
+> By default, the `make review` command reviews design documents against **ONLY** the [OPS06](https://docs.aws.amazon.com/wellarchitected/latest/framework/ops-06.html) requirements in the [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html).
+> To review against **ALL** requirements in the [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html), remove the `grep "OPS06"` command from the [Makefile](./Makefile).
+> Please be careful when reviewing against **ALL** requirements, as this may invoke the model many times and increase costs.
+
+4. Show the review results.
+
+```bash
+make tail-logs-reviewresult
+```
+
 ## Cleanup
 
 ```bash
-terraform -chdir=terraform destroy
+make terraform-destroy
 ```

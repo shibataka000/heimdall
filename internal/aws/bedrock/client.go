@@ -1,4 +1,3 @@
-// Package bedrock provides the API client, operations, and parameter types for Amazon Bedrock.
 package bedrock
 
 import (
@@ -21,13 +20,11 @@ const (
 	agentAliasID = "TSTALIASID"
 )
 
-// Client for Amazon Bedrock.
 type Client struct {
 	agent        *bedrockagent.Client
 	agentruntime *bedrockagentruntime.Client
 }
 
-// NewClient creates a new Amazon Bedrock client.
 func NewClient(ctx context.Context) (*Client, error) {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
@@ -39,7 +36,6 @@ func NewClient(ctx context.Context) (*Client, error) {
 	}, nil
 }
 
-// Ingest ingests the documents in the data source into the knowledge base.
 func (c *Client) Ingest(ctx context.Context, knowledgeBaseID string, dataSourceID string) error {
 	// Start the ingestion job.
 	startIngestionJobOutput, err := c.agent.StartIngestionJob(ctx, &bedrockagent.StartIngestionJobInput{
@@ -73,7 +69,6 @@ func (c *Client) Ingest(ctx context.Context, knowledgeBaseID string, dataSourceI
 	}
 }
 
-// InvokeAgent invokes the agent with the given agent ID and input text.
 func (c *Client) InvokeAgent(ctx context.Context, agentID string, inputText string) ([]byte, error) {
 	sessionID, err := newSessionID()
 	if err != nil {

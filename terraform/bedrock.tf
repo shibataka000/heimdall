@@ -2,38 +2,8 @@ resource "aws_bedrockagent_agent" "reviewer" {
   agent_name              = "reviewer"
   agent_resource_role_arn = aws_iam_role.bedrock_agent.arn
   foundation_model        = data.aws_bedrock_inference_profile.agent.inference_profile_arn
-  instruction             = file("${path.module}/prompts/instruction.md")
+  instruction             = file("${path.module}/files/instruction.md")
   description             = "The agent reviewing the design documents stored in the knowledge base according to the requirements in the checklist."
-
-  prompt_override_configuration {
-    prompt_configurations {
-      base_prompt_template = jsonencode({
-        "system" : file("${path.module}/prompts/post_processing.md"),
-        "messages" : [
-          {
-            "role" : "user",
-            "content" : [
-              {
-                "text" : "Please output your transformed response within <final_response></final_response> XML tags."
-              }
-            ]
-          }
-        ]
-      })
-      parser_mode          = "DEFAULT"
-      prompt_creation_mode = "OVERRIDDEN"
-      prompt_state         = "ENABLED"
-      prompt_type          = "POST_PROCESSING"
-
-      inference_configuration {
-        max_length     = 2048
-        stop_sequences = []
-        temperature    = 0.0
-        top_p          = 0.1
-        top_k          = 100
-      }
-    }
-  }
 
   depends_on = [time_sleep.wait_agent_resource_role_creation]
 }
@@ -43,6 +13,11 @@ resource "aws_bedrockagent_agent_knowledge_base_association" "documents" {
   knowledge_base_id    = aws_bedrockagent_knowledge_base.documents.id
   description          = "A knowledge base containing design documents."
   knowledge_base_state = "ENABLED"
+
+  depends_on = [
+    aws_bedrockagent_agent_action_group.checklist,
+    aws_bedrockagent_agent_action_group.reviewresult,
+  ]
 }
 
 resource "aws_bedrockagent_knowledge_base" "documents" {
@@ -82,6 +57,38 @@ resource "aws_bedrockagent_data_source" "documents" {
       bucket_arn = aws_s3_bucket.bedrock_data_source.arn
     }
   }
+}
+
+resource "aws_bedrockagent_agent_action_group" "checklist" {
+  action_group_name          = aws_lambda_function.checklist.function_name
+  agent_id                   = aws_bedrockagent_agent.reviewer.agent_id
+  agent_version              = "DRAFT"
+  description                = "チェックリストの要件を提供します。"
+  skip_resource_in_use_check = true
+
+  action_group_executor {
+    lambda = aws_lambda_function.checklist.arn
+  }
+  api_schema {
+    payload = file("${path.module}/files/checklist/api_schema.yaml")
+  }
+}
+
+resource "aws_bedrockagent_agent_action_group" "reviewresult" {
+  action_group_name          = aws_lambda_function.reviewresult.function_name
+  agent_id                   = aws_bedrockagent_agent.reviewer.agent_id
+  agent_version              = "DRAFT"
+  description                = "レビュー結果を保存します。"
+  skip_resource_in_use_check = true
+
+  action_group_executor {
+    lambda = aws_lambda_function.reviewresult.arn
+  }
+  api_schema {
+    payload = file("${path.module}/files/reviewresult/api_schema.yaml")
+  }
+
+  depends_on = [aws_bedrockagent_agent_action_group.checklist]
 }
 
 data "aws_bedrock_inference_profile" "agent" {

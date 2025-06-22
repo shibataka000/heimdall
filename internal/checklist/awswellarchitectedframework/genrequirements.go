@@ -1,5 +1,3 @@
-// Scrape the AWS Well-Architected Framework pages and generate requirements.json.
-
 //go:build ignore
 
 package main
@@ -21,7 +19,6 @@ import (
 	wa "github.com/shibataka000/heimdall/internal/checklist/awswellarchitectedframework"
 )
 
-// scrape the AWS Well-Architected Framework pages recursively.
 func scrape(base *url.URL, depth int) ([]wa.Requirement, error) {
 	resp, err := fetch(base)
 	if err != nil {
@@ -50,7 +47,6 @@ func scrape(base *url.URL, depth int) ([]wa.Requirement, error) {
 	return requirements, nil
 }
 
-// parseBestPracticePage returns the requirement in the "Best practice" page.
 func parseBestPracticePage(resp []byte) (wa.Requirement, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(resp))
 	if err != nil {
@@ -60,14 +56,15 @@ func parseBestPracticePage(resp []byte) (wa.Requirement, error) {
 	title := doc.Find("title").First().Text()
 	title = strings.TrimSuffix(title, " - AWS Well-Architected Framework")
 
+	id := strings.Split(title, " ")[0]
+
 	body := doc.Find(".awsdocs-page-header-container").NextUntil("#resources").Text()
-	body = regexp.MustCompile("\\s+").ReplaceAllString(body, " ")
+	body = regexp.MustCompile(`\s+`).ReplaceAllString(body, " ")
 	body = strings.TrimSpace(body)
 
-	return wa.Requirement{Title: title, Body: body}, nil
+	return wa.Requirement{ID: id, Title: title, Body: body}, nil
 }
 
-// parseParentPage returns the links in the "Appendix", "Pillar", "Best practice area", "Question" page.
 func parseParentPage(resp []byte) ([]*url.URL, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(resp))
 	if err != nil {
@@ -104,7 +101,6 @@ func parseParentPage(resp []byte) ([]*url.URL, error) {
 	return urls, nil
 }
 
-// fetch retrieves the content of the given URL.
 func fetch(u *url.URL) ([]byte, error) {
 	log.Printf("fetch %s", u.String())
 	resp, err := http.Get(u.String())
