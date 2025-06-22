@@ -35,14 +35,16 @@ terraform-apply: terraform-init build
 terraform-destroy: terraform-init build
 	terraform -chdir=terraform destroy
 
+.PHONY: tail-logs-checklist
+tail-logs-checklist:
+	aws logs tail $(shell terraform -chdir=terraform output -raw checklist_log_group_name) --follow --since 1d
+
+.PHONY: tail-logs-reviewresult
+tail-logs-reviewresult:
+	aws logs tail $(shell terraform -chdir=terraform output -raw reviewresult_log_group_name) --follow  --since 1d
+
 terraform/files/%/bootstrap: $(shell find . -name *.go)
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $@ -tags lambda.norpc cmd/lambda/$*/main.go
 
 terraform/.terraform/terraform.tfstate:
 	terraform -chdir=terraform init
-
-tail-logs-checklist:
-	aws logs tail $(shell terraform -chdir=terraform output -raw checklist_log_group_name) --follow --since 1d
-
-tail-logs-reviewresult:
-	aws logs tail $(shell terraform -chdir=terraform output -raw reviewresult_log_group_name) --follow  --since 1d
