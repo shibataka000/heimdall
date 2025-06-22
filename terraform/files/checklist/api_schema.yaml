@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: Checklist API
+  version: 1.0.0
+  description: チェックリストを管理する API です。
+paths:
+  /checklist/{checklistId}/requirement/{requirementId}:
+    get:
+      summary: チェックリストから要件を取得します。
+      description: チェックリストから要件を取得します。
+      operationId: getRequirement
+      parameters:
+        - name: checklistId
+          in: path
+          description: チェックリストの識別子。
+          required: true
+          schema:
+            type: string
+            enum:
+              - aws-well-architected-framework
+        - name: requirementId
+          in: path
+          description: 要件の識別子。
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: リクエストが成功しました。取得した要件を返します。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: 要件の識別子。
+                  title:
+                    type: string
+                    description: 要件のタイトル。
+                  body:
+                    type: string
+                    description: 要件の本文。
+        "400":
+          description: 不正なリクエストです。
+        "404":
+          description: リクエストされたリソースが見つかりませんでした。
+        "500":
+          description: サーバーでエラーが発生しました。

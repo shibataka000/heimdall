@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  title: Review result API
+  version: 1.0.0
+  description: レビュー結果を管理する API です。
+paths:
+  /reviewresult:
+    post:
+      summary: レビュー結果を保存します。
+      description: レビュー結果を保存します。
+      operationId: saveReviewResult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - checklistId
+                - requirementId
+                - result
+                - reason
+                - location
+              additionalProperties: false
+              properties:
+                checklistId:
+                  type: string
+                  description: チェックリストの識別子。
+                requirementId:
+                  type: string
+                  description: 要件の識別子。
+                result:
+                  type: string
+                  description: レビュー結果。
+                  enum:
+                    - 完全に満たしている
+                    - 部分的に満たしている
+                    - 満たしていない
+                    - 満たす必要がない
+                    - 判断できない
+                reason:
+                  type: string
+                  description: レビュー結果の理由。
+                locations:
+                  type: array
+                  description: レビュー結果の根拠となる設計書の箇所（ファイル名と行数）のリスト。
+                  items:
+                    type: string
+                    description: レビュー結果の根拠となる設計書の箇所（ファイル名と行数）。
+      responses:
+        "201":
+          description: レビュー結果が正常に保存されました。
+        "400":
+          description: 不正なリクエストです。
+        "500":
+          description: サーバーでエラーが発生しました。

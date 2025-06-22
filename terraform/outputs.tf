@@ -17,3 +17,13 @@ output "bedrock_data_source_s3_bucket_name" {
   value       = aws_s3_bucket.bedrock_data_source.bucket
   description = "The S3 bucket name for the data source."
 }
+
+output "checklist_log_group_name" {
+  value       = aws_cloudwatch_log_group.checklist.name
+  description = "The log group name for the lambda function 'checklist'."
+}
+
+output "reviewresult_log_group_name" {
+  value       = aws_cloudwatch_log_group.reviewresult.name
+  description = "The log group name for the lambda function 'reviewresult'."
+}
