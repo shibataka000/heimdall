@@ -42,7 +42,7 @@ make review
 
 > [!NOTE]
 >
-> By default, the `make review` command reviews design documents against **ONLY** the [OPS06](https://docs.aws.amazon.com/wellarchitected/latest/framework/ops-06.html) requirements in the [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html).
+> By default, the `make review` command reviews design documents against **ONLY** the requirements about the [OPS06](https://docs.aws.amazon.com/wellarchitected/latest/framework/ops-06.html) in the [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html).
 > To review against **ALL** requirements in the [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html), remove the `grep "OPS06"` command from the [Makefile](./Makefile).
 > Please be careful when reviewing against **ALL** requirements, as this may invoke the model many times and increase costs.
 
