@@ -18,7 +18,8 @@ Heimdall reviews design documents and ensures that they satisfy the requirements
 
 ## Setup
 
-1. Construct the knowledge base and the agent.
+1. Modify the [backend.tf](./terraform/backend.tf) according to your environment.
+2. Construct the knowledge base and the agent.
 
 ```bash
 make terraform-apply
